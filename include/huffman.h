@@ -28,3 +28,5 @@ void profondeur(phtree_t t, uint8_t prof[256]);
  *
  */
 void detruire_htree(phtree_t t);
+
+//Test
