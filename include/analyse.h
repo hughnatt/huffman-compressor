@@ -1,5 +1,7 @@
 #include <stdint.h>
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <inttypes.h>
 
 /*
  * Remplit les frequences d'apparition
@@ -8,4 +10,5 @@
  * @param uint64_t freq[256] : Tableau des fréquences à modifier
  */
 void frequences(char* filename, uint64_t freq[256]);
-//bonjour
+void ecriture_tableau_freq( uint64_t freq[256]);
+void init_tab_freq( uint64_t freq[256]);
