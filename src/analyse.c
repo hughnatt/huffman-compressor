@@ -1,8 +1,10 @@
 #include "../include/analyse.h"
+
 void init_tab_freq( uint64_t freq[256]){
 	for (int i = 0; i < 256; i++)
 	{
 		freq[i]=0;
+
 	}
 }
 
@@ -11,7 +13,7 @@ void ecriture_tableau_freq( uint64_t freq[256]){
 	for (int i = 0; i < 256; i++)
 	{
 		printf("%c :",i );
-		printf( PRIu64 "\n", freq[i]);
+		printf("%"PRIu64 "\n", freq[i]);
 	}
 }
 
@@ -19,8 +21,8 @@ void ecriture_tableau_freq( uint64_t freq[256]){
 void frequences(char* filename, uint64_t freq[256]){
 
 	FILE *f;
-	char c;
-	f=fopen( filename, "r");
+	int c;
+	f=fopen( filename, "rb");
 	if(f == NULL){
 		#ifdef DEBUG
 			printf("Error opening file \n");
@@ -31,11 +33,19 @@ void frequences(char* filename, uint64_t freq[256]){
 	init_tab_freq(freq);
 
 	while( !feof(f)){
-		fscanf(f,"%c", &c);
-		freq[(int)c]++;
+		c=fgetc(f);
+		printf("%c\n",c );
+		freq[c]++;
 	}
 	ecriture_tableau_freq(freq);
 	fclose(f);
+}
+
+void main(int argc, char const *argv[])
+{
+	uint64_t freq[256];
+	frequences("test.txt",freq);
+
 }
 
 
