@@ -1,63 +1,200 @@
 #include <stdint.h>
 #include <stdio.h>
-#include <stdint.h>
+#include <stdlib.h>
+#include "huffman.h"
 
+uint8_t buffer = 0;
+uint8_t restant = 8;
 
-uint8_t buffer;
-uint8_t restant;
+uint64_t nbsym = 0;
 
+FILE *f_in;
+FILE *f_out;
 
-void transcodage(char* file_in, char* file_out, uint8_t code[256], uint8_t profondeur[256]){
-    FILE* fin = fopen(file_in, "rb");
-    FILE* fout = fopen(file_out,"wb");
-    /* TODO Vérifier ouverture*/
-    fputs("--------",fout);
-
-    /*Mettre tableau de profondeur*/
-
-
-
-    uint8_t c;
-    
-    uint8_t cc;
-    int taillec;
-
-    int getcar = 0;
-    getcar = fgetc(fin);
-    while (getcar != EOF){
-        c = (uint8_t) getcar;
-        
-        cc = code[c];
-        taillec = profondeur[c];
-
-
-        writecode(cc,taillec);
-
-
-
-        
-        getcar = fgetc(fin);
-    }
-
+void writebyte()
+{
+    fputc(buffer, f_out);
+    buffer = 0;
+    restant = 8;
 }
 
-void writecode(uint8_t code, int taille){
-
-    if (taille <= restant){
+void writecode(uint8_t code, int taille)
+{
+    nbsym++;
+    if (taille <= restant)
+    {
         buffer = buffer << taille;
         buffer = buffer | (code & ~((-1) << taille));
         restant = restant - taille;
-        if (restant == 0){
+        if (restant == 0)
+        {
             writebyte();
         }
     }
-    else {
-        buffer = buffer << restant;
-        
+    else
+    {
+        //buffer = buffer << restant;
+        printf("%d", taille);
+        //****
+        code = code << (8 - taille);
+        while (restant != 0)
+        {
+            buffer = buffer << 1;
+            buffer = buffer | ((code & 0x80) >> 7); //Bit de poids fort ramené à droite
+            code = code << 1;
+            taille--;
+            restant--;
+        }
 
+        writebyte();
+
+        while (taille != 0)
+        {
+            buffer = buffer << 1;
+            buffer = buffer | ((code & 0x80) >> 7); //Bit de poids fort ramené à droite
+            code = code << 1;
+            restant--;
+            taille--;
+        }
+        //****
     }
 }
 
+void padcode()
+{
+    if (restant != 8)
+    {
+        buffer = buffer << restant;
+        writebyte();
+    }
+}
 
-void decodage(char* file_in, char* file_out);
+void transcodage(char *file_in, char *file_out, uint8_t code[256], uint8_t profondeur[256])
+{
+    f_in = fopen(file_in, "rb");
+    f_out = fopen(file_out, "wb");
+    /* TODO Vérifier ouverture*/
 
+    fputs("--------", f_out); //Place laissé pour le nombre d'octets
+
+    /*Mettre tableau de profondeur*/
+    for (int i = 0; i < 256; i++)
+    {
+        fputc(profondeur[i], f_out);
+    }
+
+    //uint8_t c;
+
+    uint8_t cc;
+    int taillec;
+
+    //int getcar;
+    int c = fgetc(f_in);
+    while (c != EOF)
+    {
+        //c = (uint8_t)getcar;
+        cc = code[c];
+        taillec = profondeur[c];
+
+        writecode(cc, taillec);
+
+        //getcar = fgetc(f_in);
+        c = fgetc(f_in);
+    }
+
+    padcode();
+
+    fseek(f_out, 0, SEEK_SET); // On revient au début du fichier
+
+    // On écrit la taille des données
+    int i = 0;
+    while (i < 8)
+    {
+        fputc(nbsym, f_out);
+        nbsym = nbsym >> 8;
+        i++;
+    }
+
+    fclose(f_out);
+    fclose(f_in);
+}
+
+void decodage(char *file_in, char *file_out)
+{
+    f_in = fopen(file_in, "rb");
+    f_out = fopen(file_out, "wb");
+
+    //Lire nombre de symbole à lire (8 octets)
+    uint64_t nbsym = lire_nbsym();
+
+    //Lire la table de profondeur (256 octets)
+    uint8_t profondeur[256];
+    lire_profondeur(profondeur);
+
+    //Lecture des symboles
+    restant = 0;
+    int cpt = 0;
+    uint8_t c;
+    while (cpt < nbsym)
+    {
+        c = lire_sym();
+        fputc(c, f_out);
+        cpt++;
+    }
+}
+
+void lire_profondeur(uint8_t profondeur[256]){
+    for (int i = 0; i < 256; i++)
+    {
+        profondeur[i] = fgetc(f_in);
+    }
+}
+
+uint64_t lire_nbsym()
+{
+    uint64_t nb;
+    uint64_t tmp;
+    tmp = 0;
+    tmp = fgetc(f_out);
+
+    int i = 0;
+    while (i < 8)
+    {
+
+        tmp = tmp << (56 - i * 8);
+        nb = nb | tmp;
+
+        i++;
+
+        tmp = 0;
+        tmp = fgetc(f_out);
+    }
+}
+
+uint8_t lire_sym()
+{
+    //tant que c'est pas une feuille
+    //if bitsuivant == 1
+    // a droite
+    //sinon
+    //a gauche
+
+    //return feuille->label[0]
+}
+
+uint8_t bit_suivant()
+{
+    static uint8_t c;
+
+    //Lit un octet
+    if (restant == 0)
+    {
+        c = getc(f_in);
+    }
+    else
+    {
+        restant--;
+        c = c << 1;
+    }
+    return c & 0x80;
+}
