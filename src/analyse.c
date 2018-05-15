@@ -37,15 +37,9 @@ void frequences(char* filename, uint64_t freq[256]){
 		printf("%c\n",c );
 		freq[c]++;
 	}
-	ecriture_tableau_freq(freq);
 	fclose(f);
 }
 
-void main(int argc, char const *argv[])
-{
-	uint64_t freq[256];
-	frequences("test.txt",freq);
 
-}
 
 
