@@ -5,6 +5,8 @@ SRCS=io.c huffman.c codage.c analyse.c
 OBJS=$(OBJS:.c=.o)
 
 INCDIR=../include/
+CFLAGS+=-I../include/
+
 EXEC=compression decompression
 
 
