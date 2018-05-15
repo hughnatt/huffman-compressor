@@ -1,3 +1,3 @@
-gcc -c analyse.c 
-gcc analyse.o -o analyse
-./analyse 
+gcc -c codage.c 
+gcc codage.o -o codage
+./codage 
