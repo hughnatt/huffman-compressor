@@ -1,6 +1,8 @@
 #include "../include/huffman.h"
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 
 //_______________________ Partie non déclarée _______________________
 
@@ -129,7 +131,7 @@ plist_t conversion_list(uint64_t frequence[256]) {
  * @return phtree_t : NULL si tableau de fréquence vide
  */
 phtree_t creer_htree(uint64_t frequence[256]) {
-    plist_t liste = conversion_liste();
+    plist_t liste = conversion_list(frequence);
 
     phtree_t arbre;
 
@@ -138,7 +140,7 @@ phtree_t creer_htree(uint64_t frequence[256]) {
     }
 
     while (liste->next != NULL) {
-        arbre = creer_noeud_parent(liste, liste->next);
+        arbre = creer_noeud_parent(liste->elem, liste->next->elem);
 
         ajouter_membre(liste, arbre);
 
