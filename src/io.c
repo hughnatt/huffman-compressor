@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "huffman.h"
+#include "codage.h"
 
 uint8_t buffer = 0;
 uint8_t restant = 8;
@@ -119,29 +120,38 @@ void transcodage(char *file_in, char *file_out, uint8_t code[256], uint8_t profo
     fclose(f_in);
 }
 
-void decodage(char *file_in, char *file_out)
+
+uint8_t bit_suivant()
 {
-    f_in = fopen(file_in, "rb");
-    f_out = fopen(file_out, "wb");
+    static uint8_t c;
 
-    //Lire nombre de symbole à lire (8 octets)
-    uint64_t nbsym = lire_nbsym();
-
-    //Lire la table de profondeur (256 octets)
-    uint8_t profondeur[256];
-    lire_profondeur(profondeur);
-
-    //Lecture des symboles
-    restant = 0;
-    int cpt = 0;
-    uint8_t c;
-    while (cpt < nbsym)
+    //Lit un octet
+    if (restant == 0)
     {
-        c = lire_sym();
-        fputc(c, f_out);
-        cpt++;
+        c = getc(f_in);
     }
+    else
+    {
+        restant--;
+        c = c << 1;
+    }
+    return c & 0x80;
 }
+
+uint8_t lire_sym(phtree_t arbre_canonique)
+{
+    phtree_t node = arbre_canonique;
+    while (node->taille_label != 1){
+        if (bit_suivant){
+            node = node->fdroit;
+        } else {
+            node = node->fgauche;
+        }
+    }
+
+    return node->label[0];
+}
+
 
 void lire_profondeur(uint8_t profondeur[256]){
     for (int i = 0; i < 256; i++)
@@ -171,30 +181,32 @@ uint64_t lire_nbsym()
     }
 }
 
-uint8_t lire_sym()
+void decodage(char *file_in, char *file_out)
 {
-    //tant que c'est pas une feuille
-    //if bitsuivant == 1
-    // a droite
-    //sinon
-    //a gauche
+    f_in = fopen(file_in, "rb");
+    f_out = fopen(file_out, "wb");
 
-    //return feuille->label[0]
+    //Lire nombre de symbole à lire (8 octets)
+    uint64_t nbsym = lire_nbsym();
+
+    //Lire la table de profondeur (256 octets)
+    uint8_t profondeur[256];
+    lire_profondeur(profondeur);
+    //Créer arbre canonique
+    phtree_t abr_can = arbre_canonique(profondeur);
+
+    //Lecture des symboles
+    restant = 0;
+    int cpt = 0;
+    uint8_t c;
+    while (cpt < nbsym)
+    {
+        c = lire_sym(abr_can);
+        fputc(c, f_out);
+        cpt++;
+    }
 }
 
-uint8_t bit_suivant()
-{
-    static uint8_t c;
 
-    //Lit un octet
-    if (restant == 0)
-    {
-        c = getc(f_in);
-    }
-    else
-    {
-        restant--;
-        c = c << 1;
-    }
-    return c & 0x80;
-}
+
+
