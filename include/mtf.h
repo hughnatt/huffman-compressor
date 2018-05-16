@@ -1,8 +1,7 @@
-#include <stdio.h>
 
 /**
- *Prend un fichier à coder en MTF en entrée et le fichier codé en sortie
- *@param file *entree
- *@return file *
+ *Prend le nom d'un fichier à coder en MTF en entrée et
+ * crée un fichier avec le meme nom mais avec un suffixe _MTF
+ *@param char *entree : le nom du fichier à coder en MTF
  */
-FILE *mtf_codage(FILE *entree);
+void mtf_codage(char *entree);

@@ -1,5 +1,6 @@
+#include <stdio.h>
 #include "mtf.h"
 
-FILE *mtf_codage(FILE *entree){
-	return NULL;
+void mtf_codage(char *entree){
+	return ;
 }
