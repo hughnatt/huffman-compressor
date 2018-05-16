@@ -70,6 +70,48 @@ void padcode()
     }
 }
 
+void rle_prof(uint8_t profondeur[256], uint8_t profondeur_rle[512], uint8_t* taille_rle){
+
+    char prev2 = profondeur[0];
+    char prev1 = profondeur[1];
+
+    int j=0;
+    int taille;
+
+    profondeur_rle[j++] = prev2;
+    profondeur_rle[j++] = prev1;
+
+    int k;
+    for(k=0; k<256; k++){
+        printf("%d %d\n", k, profondeur[k]);
+    }
+    
+    for(int i=2; i<256; i++){
+
+        if(prev1 == prev2){
+
+            taille = 0;
+
+            while(profondeur[i] == prev1){
+
+            prev2 = prev1;
+            prev1 = profondeur[i];
+
+            taille++;
+            i++;
+
+           }
+           profondeur_rle[j++] = taille;       
+        }
+        
+        profondeur_rle[j++] = profondeur[i];
+        prev2 = prev1;
+        prev1 = profondeur[i];
+
+    }
+    *taille_rle = j-1;
+}
+
 void transcodage(char *file_in, char *file_out, uint8_t code[256], uint8_t profondeur[256])
 {
     f_in = fopen(file_in, "rb");
@@ -79,9 +121,19 @@ void transcodage(char *file_in, char *file_out, uint8_t code[256], uint8_t profo
     fputs("--------", f_out); //Place laissé pour le nombre d'octets
 
     /*Mettre tableau de profondeur*/
-    for (int i = 0; i < 256; i++)
-    {
-        fputc(profondeur[i], f_out);
+    uint8_t taille_rle;
+    uint8_t profondeur_rle[512];
+
+    
+    rle_prof(profondeur, profondeur_rle, &taille_rle);
+    fputc(taille_rle,f_out);
+
+    int i = 0;
+    char a;
+    while (i < taille_rle){
+        a = profondeur_rle[i];
+        fputc(a,f_out);
+        i++;
     }
 
     //uint8_t c;
@@ -108,7 +160,7 @@ void transcodage(char *file_in, char *file_out, uint8_t code[256], uint8_t profo
     fseek(f_out, 0, SEEK_SET); // On revient au début du fichier
 
     // On écrit la taille des données
-    int i = 0;
+    i = 0;
     while (i < 8)
     {
         fputc(nbsym, f_out);
@@ -193,7 +245,7 @@ void decodage(char *file_in, char *file_out)
     uint8_t profondeur[256];
     lire_profondeur(profondeur);
     //Créer arbre canonique
-    phtree_t abr_can = arbre_canonique(profondeur);
+    //phtree_t abr_can = arbre_canonique(profondeur);
 
     //Lecture des symboles
     restant = 0;
@@ -201,7 +253,7 @@ void decodage(char *file_in, char *file_out)
     uint8_t c;
     while (cpt < nbsym)
     {
-        c = lire_sym(abr_can);
+        //c = lire_sym(abr_can);
         fputc(c, f_out);
         cpt++;
     }
