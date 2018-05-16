@@ -1,8 +1,8 @@
 #include "../include/codage.h"
 
 phtree_t arbre_canonique(uint8_t prof[256]){
+	
 	char racine[256];
-
 	delete_null_prof(prof, racine);
 	ecriture_tableau(racine);
 	printf("\n");
@@ -11,7 +11,7 @@ phtree_t arbre_canonique(uint8_t prof[256]){
 	printf("\n");
 	tri_tableau_racine_etape2(prof,racine);
 	ecriture_tableau(racine);
-printf("\n");
+	printf("\n");
 
 
 return NULL;
@@ -77,7 +77,9 @@ void tri_tableau_racine_etape2(uint8_t prof[256], char racine[256]){
 
 
 
-void correspondance(phtree_t t, uint8_t code[256]){ return;}
+void correspondance(phtree_t t, uint8_t code[256]){ 
+	return;
+}
 
 void ecriture_tableau( char racine[256]){
 
@@ -100,10 +102,10 @@ void delete_null_prof(uint8_t prof[256], char racine[256]){
 	racine[k]= '\0';
 }
 
-void init_tab_freq( uint8_t freq[256]){
+void init_tab( uint8_t tab[256]){
 	for (int i = 0; i < 256; i++)
 	{
-		freq[i]=0;
+		tab[i]=0;
 
 	}
 }
@@ -111,7 +113,7 @@ void init_tab_freq( uint8_t freq[256]){
 void main(int argc, char const *argv[])
 {
 	uint8_t prof[256];
-	init_tab_freq( prof);
+	init_tab( prof);
 	prof[97]=1;
 	prof[98]=6;
 	prof[99]=4;
