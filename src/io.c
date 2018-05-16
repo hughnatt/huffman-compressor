@@ -95,7 +95,7 @@ void transcodage(char *file_in, char *file_out, uint8_t code[256], uint8_t profo
     {
         //c = (uint8_t)getcar;
         cc = code[c];
-        taillec = profondeur[c];
+        taillec = profondeur[c] - 1;
 
         writecode(cc, taillec);
 
@@ -142,7 +142,7 @@ uint8_t lire_sym(phtree_t arbre_canonique)
 {
     phtree_t node = arbre_canonique;
     while (node->taille_label != 1){
-        if (bit_suivant){
+        if (bit_suivant()){
             node = node->fdroit;
         } else {
             node = node->fgauche;
@@ -179,6 +179,7 @@ uint64_t lire_nbsym()
         tmp = 0;
         tmp = fgetc(f_out);
     }
+    return nb;
 }
 
 void decodage(char *file_in, char *file_out)
