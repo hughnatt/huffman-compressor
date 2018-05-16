@@ -1,9 +1,14 @@
+#ifndef _HUFFMAN_H_
+#define _HUFFMAN_H_
+
 #include <stdint.h>
+
 
 typedef struct t
 {
     uint64_t poids;
     char label[256];
+    uint64_t taille_label;
     struct t *fgauche;
     struct t *fdroit;
 } htree_t, *phtree_t;
@@ -28,3 +33,5 @@ void profondeur(phtree_t t, uint8_t prof[256]);
  *
  */
 void detruire_htree(phtree_t t);
+
+#endif
