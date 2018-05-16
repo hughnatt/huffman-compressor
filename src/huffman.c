@@ -96,14 +96,18 @@ plist_t ajouter_membre(plist_t list, phtree_t membre) {
     }
 
     if (tmp == NULL) {
-        prev->next = new;
+        if(prev==NULL){
+            list = new;
+        }else{
+            prev->next = new;
+        }
         new->next = NULL;
     }
 
     return list;
 }
 
-inline plist_t supprimer_plus_petit_membre(plist_t l) { return l->next; }
+plist_t supprimer_plus_petit_membre(plist_t l) { return l->next; }
 
 plist_t conversion_list(uint64_t frequence[256]) {
     plist_t result = NULL;  // on initialise une liste
@@ -120,6 +124,8 @@ plist_t conversion_list(uint64_t frequence[256]) {
         // on met la feuille à une position adaptée dans la liste
         result = ajouter_membre(result, feuille);
     }
+
+    return result;
 }
 
 //_______________________ Partie déclarée _______________________
@@ -144,8 +150,8 @@ phtree_t creer_htree(uint64_t frequence[256]) {
 
         ajouter_membre(liste, arbre);
 
-        supprimer_plus_petit_membre(liste);
-        supprimer_plus_petit_membre(liste);
+        liste=supprimer_plus_petit_membre(liste);
+        liste=supprimer_plus_petit_membre(liste);
     }
 
     return arbre;
@@ -156,7 +162,7 @@ void recur_profondeur(phtree_t t, uint8_t prof[256], uint64_t profondeur){
 	assert(t->taille_label>0);
 	
 	if(t->taille_label==1){
-		prof[t->label[0]]=profondeur;
+		prof[(int)t->label[0]]=profondeur;
 	}else{
 		recur_profondeur(t->fgauche,prof,profondeur+1);
 		recur_profondeur(t->fdroit,prof,profondeur+1);
