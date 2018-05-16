@@ -128,7 +128,8 @@ uint8_t bit_suivant()
     //Lit un octet
     if (restant == 0)
     {
-        c = getc(f_in);
+        c = fgetc(f_in);
+        restant = 7;
     }
     else
     {
@@ -162,24 +163,58 @@ void lire_profondeur(uint8_t profondeur[256]){
 
 uint64_t lire_nbsym()
 {
-    uint64_t nb;
+    uint64_t nb = 0;
     uint64_t tmp;
-    tmp = 0;
-    tmp = fgetc(f_out);
 
-    int i = 0;
-    while (i < 8)
+    int i = 7;
+    while (i >= 0)
     {
-
+        tmp = 0;        
+        tmp = fgetc(f_in);
         tmp = tmp << (56 - i * 8);
         nb = nb | tmp;
-
-        i++;
-
-        tmp = 0;
-        tmp = fgetc(f_out);
+        i--;
     }
     return nb;
+}
+
+void afficher_arbre(phtree_t a, int niveau)
+{
+    /*
+    affichage de l'arbre a
+    on l'affiche en le penchant sur sa gauche
+    la partie droite (haute) se retrouve en l'air
+    */
+
+    int i;
+
+    if (a != NULL)
+    {
+        afficher_arbre(a->fdroit, niveau + 1);
+
+        for (i = 0; i < niveau; i++)
+            printf("\t");
+        for (i = 0; i < a->taille_label ; i++){
+            printf("%c",a->label[i]);
+        }
+        printf(" (%d)\n\n", niveau);
+
+        afficher_arbre(a->fgauche, niveau + 1);
+    }
+    return;
+}
+
+void displaytab256(uint8_t tab[256]){
+    for (int k = 0; k < 256 ; k++){
+        //if ( tab[k] != 0){
+            printf("%d | ",k);
+            for (int i = 0; i < 8; i++){
+                printf("%d", !!((tab[k] << i) & 0x80));
+            }
+            printf(" \n");
+        //}
+    }
+    printf("\n");
 }
 
 void decodage(char *file_in, char *file_out)
@@ -189,14 +224,23 @@ void decodage(char *file_in, char *file_out)
 
     //Lire nombre de symbole à lire (8 octets)
     uint64_t nbsym = lire_nbsym();
+    printf("Symboles à lire : %ld\n",nbsym);
 
     //Lire la table de profondeur (256 octets)
     uint8_t profondeur[256];
     lire_profondeur(profondeur);
+    displaytab256(profondeur);
+
+    
+    
     //Créer arbre canonique
     phtree_t abr_can = arbre_canonique(profondeur);
 
+    afficher_arbre(abr_can,1);
+
+    
     //Lecture des symboles
+    
     restant = 0;
     int cpt = 0;
     uint8_t c;

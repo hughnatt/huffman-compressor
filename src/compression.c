@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-void displaytab256(uint8_t tab[256]){
+static void displaytab256(uint8_t tab[256]){
     for (int k = 0; k < 256 ; k++){
         //if ( tab[k] != 0){
             printf("%d | ",k);
@@ -19,7 +19,7 @@ void displaytab256(uint8_t tab[256]){
 }
 
 
-void afficher_arbre(phtree_t a, int niveau)
+static void afficher_arbre(phtree_t a, int niveau)
 {
     /*
     affichage de l'arbre a
