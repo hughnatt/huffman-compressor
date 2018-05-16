@@ -1,5 +1,85 @@
+
+
 #include "../include/codage.h"
 
+void init_tab( uint8_t tab[256]){
+	for (int i = 0; i < 256; i++)
+	{
+		tab[i]=0;
+
+	}
+}
+int appartient(char c, char* label){
+	int present =0;
+	int i=0;
+	while(label[i]!='\0' && !present){
+		if(label[i]== c){
+			present =1;
+		}
+		i++;
+	}
+	return present;
+
+}
+
+
+uint8_t recherche(phtree_t t, char c){
+	uint8_t code = 0;
+	phtree_t current = t;
+	while(current!=NULL && current->label[1] != '\0'){
+
+		if(appartient(c,current->fdroit->label)){
+			code = (code << 1) | 1;
+			t = current->fdroit;
+		}else{
+			code = code << 1;
+			t = current->fgauche;
+		}
+	}
+	return code;
+}
+
+void correspondance(phtree_t t, uint8_t code[256]){ 
+
+	char* racine = t->label;
+	init_tab(code);
+	int i =0;
+	while(racine[i]!='\0'){
+		code[racine[i]]=recherche(t,racine[i]);
+		i++;
+	}
+
+	return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 phtree_t arbre_canonique(uint8_t prof[256]){
 	
 	char racine[256];
@@ -77,9 +157,6 @@ void tri_tableau_racine_etape2(uint8_t prof[256], char racine[256]){
 
 
 
-void correspondance(phtree_t t, uint8_t code[256]){ 
-	return;
-}
 
 void ecriture_tableau( char racine[256]){
 
@@ -102,13 +179,7 @@ void delete_null_prof(uint8_t prof[256], char racine[256]){
 	racine[k]= '\0';
 }
 
-void init_tab( uint8_t tab[256]){
-	for (int i = 0; i < 256; i++)
-	{
-		tab[i]=0;
 
-	}
-}
 
 void main(int argc, char const *argv[])
 {
@@ -124,3 +195,4 @@ void main(int argc, char const *argv[])
 	
 	
 }
+*/
