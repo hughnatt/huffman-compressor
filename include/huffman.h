@@ -1,4 +1,8 @@
+#ifndef _HUFFMAN_H_
+#define _HUFFMAN_H_
+
 #include <stdint.h>
+
 
 typedef struct t
 {
@@ -30,3 +34,5 @@ void profondeur(phtree_t t, uint8_t prof[256]);
  * @param phtree_t t
  */
 void detruire_htree(phtree_t t);
+
+#endif
