@@ -35,7 +35,7 @@ void writecode(uint8_t code, int taille)
     else
     {
         //buffer = buffer << restant;
-        printf("%d", taille);
+        //printf("%d\n", taille);
         //****
         code = code << (8 - taille);
         while (restant != 0)
@@ -169,7 +169,7 @@ uint64_t lire_nbsym()
     int i = 7;
     while (i >= 0)
     {
-        tmp = 0;        
+        tmp = 0;    
         tmp = fgetc(f_in);
         tmp = tmp << (56 - i * 8);
         nb = nb | tmp;
@@ -195,7 +195,7 @@ void afficher_arbre(phtree_t a, int niveau)
         for (i = 0; i < niveau; i++)
             printf("\t");
         for (i = 0; i < a->taille_label ; i++){
-            printf("%c",a->label[i]);
+            printf("%x",a->label[i]);
         }
         printf(" (%d)\n\n", niveau);
 

@@ -22,7 +22,7 @@ int getProfMax(uint8_t prof[256])
 /**
  * Créé une feuille avec le nom label
  */
-phtree_t create_leaf(char label, int value)
+phtree_t create_leaf(uint8_t label, int value)
 {
 	phtree_t tmp = (phtree_t)malloc(sizeof(htree_t));
 	tmp->label[0] = label;
@@ -42,7 +42,7 @@ void loadFile(file_fifo *f, uint8_t prof[256], int value)
 	{
 		if (value == prof[i])
 		{
-			put_file(create_leaf((char)i, value), f);
+			put_file(create_leaf((uint8_t)i, value), f);
 		}
 	}
 }
@@ -92,9 +92,11 @@ phtree_t arbre_canonique(uint8_t prof[256])
 
 	while (profondeur > 1)
 	{
-
 		node2 = get_file(&f);
-
+		if (profondeur == 3){
+			printf("-----Profondeur=3------\n");
+		}
+		
 		put_file(create_node(node1, node2, profondeur - 1), &f);
 
 		node1 = get_file(&f);
@@ -139,6 +141,10 @@ phtree_t get_file(file_fifo *f)
 		phtree_t a = f->tab[f->t];
 		f->t = (f->t + 1) % SIZE_FILE;
 		f->N--;
+
+		if (a == NULL){
+			printf("WARNING get_file has returned NULL\n");
+		}
 		return a;
 	}
 }
@@ -159,7 +165,7 @@ void init_tab(uint8_t tab[256])
 	}
 }
 
-int appartient(char c, char *label, uint8_t taille_label)
+int appartient(uint8_t c, uint8_t *label, uint8_t taille_label)
 {
 	int present = 0;
 	int i = 0;
@@ -174,7 +180,7 @@ int appartient(char c, char *label, uint8_t taille_label)
 	return present;
 }
 
-uint8_t recherche(phtree_t t, char c)
+uint8_t recherche(phtree_t t, uint8_t c)
 {
 	uint8_t code = 0;
 	phtree_t current = t;
@@ -198,7 +204,7 @@ uint8_t recherche(phtree_t t, char c)
 void correspondance(phtree_t t, uint8_t code[256])
 {
 
-	char *racine = t->label;
+	uint8_t *racine = t->label;
 	init_tab(code);
 	int i = 0;
 	while (i < t->taille_label)

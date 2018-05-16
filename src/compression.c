@@ -36,7 +36,7 @@ static void afficher_arbre(phtree_t a, int niveau)
         for (i = 0; i < niveau; i++)
             printf("\t");
         for (i = 0; i < a->taille_label ; i++){
-            printf("%c",a->label[i]);
+            printf("%x",a->label[i]);
         }
         printf(" (%d)\n\n", niveau);
 
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]){
 
     phtree_t hufftree = creer_htree(freq_tab);
     profondeur(hufftree, prof_tab);
-    
+    afficher_arbre(hufftree,1);    
     displaytab256(prof_tab);
     detruire_htree(hufftree);
 
@@ -73,6 +73,7 @@ int main(int argc, char* argv[]){
 
 
     correspondance(huffcan,code_tab);
+    printf("TABLEAU DE CODES\n");
     displaytab256(code_tab);
 
     transcodage(argv[1],"fencode.txt",code_tab,prof_tab);

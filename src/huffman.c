@@ -18,7 +18,7 @@ typedef struct c {
  * @param char label[256]
  * @result phtree : la feuille crée
  */
-phtree_t creer_feuille(uint64_t poids, char label) {
+phtree_t creer_feuille(uint64_t poids, uint8_t label) {
     phtree_t result = malloc(sizeof(htree_t));
     
     result->poids = poids;
@@ -119,7 +119,7 @@ plist_t conversion_list(uint64_t frequence[256]) {
         }
 
         // sinon on créer une feuille pour ce caractère
-        phtree_t feuille = creer_feuille(frequence[i], (char)i);
+        phtree_t feuille = creer_feuille(frequence[i], (uint8_t)i);
 
         // on met la feuille à une position adaptée dans la liste
         result = ajouter_membre(result, feuille);

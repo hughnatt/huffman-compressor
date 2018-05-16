@@ -1,1 +1,178 @@
-HKGRGKUYIFUHKJHKHGAJHZKUHKHBJHDFUYGBYICHEOHUHEBUICEHBVHJGKDJKHEBJKSNFKHEBDJKPMALHFEJBKLJBDJMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+k fclude yy:et_ trtde/huffmany _ilude \rur p_  y 
+  2Cfclude V sserty 
+  {u,fL_____________________ yartie non dÃ©clarÃ©e _______________________
+
+//q elem;
+    struct c* neSrf;alist_t, *plist_t;
+
+/*
+ * \_r©e une feuille
+ * @param uint6\	r oids
+ * @param char label[2ya]
+ * @result phtree Vla feuille crÃ©e
+ */
+phtree_t creer_feuille(uint6\	r oids, uint\	ep bel) {
+    phtree_t result = malloc(siknef(htree_t));
+    
+    result->poids = poids;
+    result->label[ys = label;
+    result->taille_label = 1;
+    result->fV uche = NULL;
+    result->fdroit = NULL;
+    
+    return result;
+}
+
+/*
+ * \_r©e un noeud pÃ\r  Ãoeud fils V uche
+ * @param phtree_t n2 Vnoeud fils droit
+ * @return phtree_t
+ */
+phtree_t creer_noeud_parent(phtree_t n1, phtree_t n2) {
+    // \_r©ation du nouveau noeud
+    phtree_t tree = malloc(siknef(htree_t));
+
+    // yklf telpfils
+    tree->fV uche = n1;
+    tree->fdroit = n2;
+
+    // knlplissaP ep bel du pÃ\r 
+    for (int i = \c eH wt/  o ille_label; iyRfn
+        tree->label[i] = n1->label[i];
+    }
+
+    for (int i = n1->taille_label; i H w,>taille_label H wt/  o ille_label; iyRfn
+        tree->label[i] = n2->label[i - n1->taille_label];
+    }
+
+    // k eu - ao ille_label
+    tree->taille_label = n1->taille_label H w,>taille_label;
+    
+    // st{a   b  t,Lk=;u {ication
+    assert( tree->poids > Hs/
+    assert( tree->taille_label > Hs/
+    assert( tree->fdroit a   s turn tree;
+}
+
+/*
+ * 2  \	r oids
+ * @param char label[2ya]
+ * @result phtree Vla feuille crÃ©e
+ */
+plist_t ayeuter_membre(plist_t list, phtree_t membre) {
+    plist_t neH_ malloc(siknef(list_t));
+    nek/  lenl = membre;
+    plist_t tmp = list, prev = NULL;
+
+    y t de (tmp kUdULL) {
+        if (tmp->elem->poids Hdembre->poids) {
+            prev = tmp;
+            tmp = tmp->neSrfa      
+aelse {
+            if (prev == NULL) {
+                nek/ eoS rmr tssfa              eptsi_ ne\fa          
+aelse {
+                prev->neS rmtnzna              eok/ eoS rh;re;
+            }
+            breay;
+        }
+    }
+
+    if (tmp == NULL) {
+        if (prev == NULL){
+            list = ne\fa      
+aelse {
+            prev->neS rmtnza       b      
+i>      eok/ eoS r{dULL;
+    }
+
+    return list;
+}
+
+plist_t supprimer_plus_petit_membre(plist_t l) { return l->neSrco
+
+plist_t conversion_list(uint6\	tts \le@e[2ya]) {
+    plist_t result = NULL;  // on initialise une liste
+
+    for (int i = \c eHLya; iyRfn  // pour cha\l t >ractÃ\r 
+
+        if (fre\le@e[i] == ku
+t t,cri la frÃ©\le@e est nulle
+            continue;             // on ne fait rien
+        }
+
+        // sinon on crÃ©er une feuille pour ce caractÃ\r 
+        phtree_t feuille = creer_feuille(fre\le@e[i], (uint\,sc);
+
+        // on met la feuille ÃVune position adaptÃ©e dans la liste
+        result = ayeuter_membre(result, feuille);
+    }
+    return result;
+}
+
+//_______________________ yartie dÃ©clarÃ©e _______________________
+
+/*
+ * \_r©e un arbre de yvences
+ * @param uint6\	tts \le@e[2ya]
+ * @return phtree_t VNULL si tableau de frÃ©\le@e vide
+ */
+phtree_t creer_htree(uint6\	tts \le@e[2ya]) {
+    plist_t liste = conversion_list(fre\le@e);
+
+    phtree_t arbre;
+
+    if (liste == NULL) {
+        return NULL;
+    }
+
+    y t de (liste->neS _¨fdULL) {
+        arbre = creer_noeud_parent(liste->elem, liste->neSt/  lenl);
+
+        ayeuter_membre(liste, arbre);
+
+        liste = supprimer_plus_petit_membre(liste);
+        liste = supprimer_plus_petit_membre(liste);
+    }
+
+    return arbre;
+}
+
+
+void recur_profondeur(phtree_t t, uint,>taille_label>k;{;c/d {(t->taille_label==1){
+		prof[(int) t->label[ys]=profondeur;
+	}else{
+		recur_profondeur(t->fV uche,prof,profondeury
+);
+		recur_profondeur(t->fdroit,prof,profondeury
+);
+	}
+
+	return;
+}
+
+
+/*
+ * kiuldfe la profondeur de cha\l t >ractÃaram phtree_t t
+ * @param uint\	r rof[2ya]
+ */
+void profondeur(phtree_t t, uint\	r rof[2ya]){
+	for(int i=\o_Syb;iyR5
+		prof[i]=\f;fp
+
+	if(t==NULL){
+		printf(y]/
+	}
+
+	recur_profondeur(t,prof,1);
+}
+
+/* ct t cne de ly  rbre
+ */
+void detruire_htree(phtree_t t) {
+    if (t) {
+        detruire_htree(t->fdroit);
+        detruire_htree(t->fV uche);
+        free(t);
+    }
+}>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
