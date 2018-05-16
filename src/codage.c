@@ -157,7 +157,7 @@ int isEmpty(file_fifo *f)
 	return f->N == 0;
 }
 
-void init_tab(uint8_t tab[256])
+void init_tab(uint64_t tab[256])
 {
 	for (int i = 0; i < 256; i++)
 	{
@@ -180,9 +180,9 @@ int appartient(uint8_t c, uint8_t *label, uint8_t taille_label)
 	return present;
 }
 
-uint8_t recherche(phtree_t t, uint8_t c)
+uint64_t recherche(phtree_t t, uint8_t c)
 {
-	uint8_t code = 0;
+	uint64_t code = 0;
 	phtree_t current = t;
 	while (current->fgauche != NULL)
 	{
@@ -201,7 +201,7 @@ uint8_t recherche(phtree_t t, uint8_t c)
 	return code;
 }
 
-void correspondance(phtree_t t, uint8_t code[256])
+void correspondance(phtree_t t, uint64_t code[256])
 {
 
 	uint8_t *racine = t->label;

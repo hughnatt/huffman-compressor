@@ -54,7 +54,7 @@ int main(int argc, char* argv[]){
 
     uint64_t freq_tab[256];
     uint8_t prof_tab[256];
-    uint8_t code_tab[256];
+    uint64_t code_tab[256];
 
     printf("========= TABLEAU FREQUENCES ========\n");
     frequences(argv[1],freq_tab);
@@ -73,8 +73,8 @@ int main(int argc, char* argv[]){
 
 
     correspondance(huffcan,code_tab);
-    printf("TABLEAU DE CODES\n");
-    displaytab256(code_tab);
+    //printf("TABLEAU DE CODES\n");
+    //displaytab256(code_tab);
 
     transcodage(argv[1],"fencode.txt",code_tab,prof_tab);
 
