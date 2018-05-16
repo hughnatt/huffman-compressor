@@ -49,8 +49,8 @@ phtree_t creer_noeud_parent(phtree_t n1, phtree_t n2) {
         tree->label[i] = n1->label[i];
     }
 
-    for (int i = n1->taille_label; i < n2->taille_label; i++) {
-        tree->label[i] = n2->label[i];
+    for (int i = n1->taille_label; i < n1->taille_label + n2->taille_label; i++) {
+        tree->label[i] = n2->label[i - n1->taille_label];
     }
 
     // Calcul taille_label
@@ -152,6 +152,10 @@ phtree_t creer_htree(uint64_t frequence[256]) {
 
         liste=supprimer_plus_petit_membre(liste);
         liste=supprimer_plus_petit_membre(liste);
+    }
+
+    if(arbre==NULL){
+        arbre = creer_feuille(liste->elem->poids,liste->elem->label[0]);
     }
 
     return arbre;
