@@ -1,3 +1,4 @@
-gcc -c codage.c 
-gcc codage.o -o codage
-./codage 
+gcc -c mtf.c 
+gcc mtf.o -o mtf
+./mtf
+gedit decodage_mtf
