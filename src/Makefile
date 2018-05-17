@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -Werror -g
 
-SRCS=io.c huffman.c codage.c analyse.c
+SRCS=io.c huffman.c codage.c analyse.c rle.c mtf.c
 OBJS=$(SRCS:.c=.o)
 
 INCDIR=../include/

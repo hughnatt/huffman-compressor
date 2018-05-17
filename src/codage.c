@@ -36,7 +36,7 @@ phtree_t create_leaf(uint8_t label, int value)
 /**
  * Remplie la file avec les noeuds de profondeurs "value", (appelle la fonction de création de feuille)
  */
-void loadFile(file_fifo *f, uint8_t prof[256], int value)
+void loadFile(file_fifo *f, uint8_t prof[256], uint8_t value)
 {
 	for (int i = 255; i >= 0; i--)
 	{
@@ -93,7 +93,7 @@ phtree_t arbre_canonique(uint8_t prof[256])
 	while (profondeur > 1)
 	{
 		node2 = get_file(&f);
-		
+
 		put_file(create_node(node1, node2, profondeur - 1), &f);
 
 		node1 = get_file(&f);
@@ -132,14 +132,18 @@ int put_file(phtree_t a, file_fifo *f)
 phtree_t get_file(file_fifo *f)
 {
 	if (isEmpty(f))
+	{
+		printf("ELEMENT NULL RENVOYE ! ! !\n");
 		return NULL;
+	}
 	else
 	{
 		phtree_t a = f->tab[f->t];
 		f->t = (f->t + 1) % SIZE_FILE;
 		f->N--;
 
-		if (a == NULL){
+		if (a == NULL)
+		{
 			printf("WARNING get_file has returned NULL\n");
 		}
 		return a;
@@ -206,7 +210,7 @@ void correspondance(phtree_t t, uint64_t code[256])
 	int i = 0;
 	while (i < t->taille_label)
 	{
-		code[(int) racine[i]] = recherche(t, racine[i]);
+		code[(int)racine[i]] = recherche(t, racine[i]);
 		i++;
 	}
 

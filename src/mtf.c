@@ -6,7 +6,7 @@
 #include "stdint.h"
 
 /*Initialisation de la table mtf*/
-void init_tab(char mtf[256]){
+static void init_tab(char mtf[256]){
 	for (int i = 0; i < 256; ++i)
 	{
 		mtf[i]=(char)(i);
@@ -36,7 +36,6 @@ char codage(char c, char mtf[256]){
 void decalage(char c, char mtf[256]){
 
 	int i =1;
-	int k=1;
 	char tmp0, tmp;
 	tmp0 = mtf[0];
 	uint8_t int_c=c;
