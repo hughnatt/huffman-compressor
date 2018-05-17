@@ -109,26 +109,33 @@ void writebyte()
 
 void writecode(uint64_t code, int taille)
 {
+    #ifdef DEBUG
     printf("Taille : %d", taille);
     printf("Encode : ");
     for (int i = 8 - taille; i < 8; i++)
     {
         printf("%d", !!((code << i) & 0x80));
     }
+    #endif
 
     nbsym++;
 
     //On décale le bit de poids fort vers la gauche
     code = code << (64 - taille);
 
+    #ifdef DEBUG
     printf("\tEffective : ");
+    #endif
+
     //On lit chaque bit valide du code
     
         while ( taille > 0)
         {
             buffer = buffer << 1;
             buffer = buffer | ((code & 0x8000000000000000) >> 63); //Bit de poids fort ramené à droite
+            #ifdef DEBUG
             printf("%ld",((code & 0x8000000000000000) >> 63));
+            #endif
             code = code << 1;
             taille--;
             restant--;
@@ -136,10 +143,10 @@ void writecode(uint64_t code, int taille)
                 writebyte();            
             }
         }
+    #ifdef DEBUG
     printf("\n");
+    #endif
     
-    //****
-    //}
 }
 
 void padcode()
@@ -186,8 +193,11 @@ void transcodage(char *file_in, char *file_out, uint64_t code[256], uint8_t prof
         //c = (uint8_t)getcar;
         cc = code[c];
         taillec = profondeur[c] - 1;
-
+        
+        #ifdef DEBUG
         printf("Caractere %x (%c) -- ", c, c);
+        #endif
+
         writecode(cc, taillec);
 
         //getcar = fgetc(f_in);
@@ -272,33 +282,6 @@ uint64_t lire_nbsym()
     return nb;
 }
 
-void afficher_arbre(phtree_t a, int niveau)
-{
-    /*
-    affichage de l'arbre a
-    on l'affiche en le penchant sur sa gauche
-    la partie droite (haute) se retrouve en l'air
-    */
-
-    int i;
-
-    if (a != NULL)
-    {
-        afficher_arbre(a->fdroit, niveau + 1);
-
-        for (i = 0; i < niveau; i++)
-            printf("\t");
-        for (i = 0; i < a->taille_label; i++)
-        {
-            printf("%x", a->label[i]);
-        }
-        printf(" (%d)\n\n", niveau);
-
-        afficher_arbre(a->fgauche, niveau + 1);
-    }
-    return;
-}
-
 void displaytab256(uint8_t tab[256])
 {
     for (int k = 0; k < 256; k++)
@@ -328,12 +311,17 @@ void decodage(char *file_in, char *file_out)
     uint8_t profondeur[256];
     //lire_profondeur(profondeur);
     decode_rle_prof(profondeur);
+
+    #ifdef DEBUG
     displaytab256(profondeur);
+    #endif
 
     //Créer arbre canonique
     phtree_t abr_can = arbre_canonique(profondeur);
 
+    #ifdef DEBUG 
     afficher_arbre(abr_can, 1);
+    #endif
 
     //Lecture des symboles
 
@@ -346,4 +334,7 @@ void decodage(char *file_in, char *file_out)
         fputc(c, f_out);
         cpt++;
     }
+
+    fclose(f_in);
+    fclose(f_out);
 }

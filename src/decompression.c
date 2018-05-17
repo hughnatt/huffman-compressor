@@ -1,6 +1,8 @@
 #include "io.h"
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 int main(int argc, char* argv[]){
 
@@ -9,7 +11,14 @@ int main(int argc, char* argv[]){
         return -1;
     }
 
-    decodage(argv[1],"fdecode.txt");
+    
+    char* new_filename = malloc(strlen(argv[1] + 1) * sizeof(char));
+    strcpy(new_filename,argv[1]);
+    
+    char* tmp = strrchr(argv[1],'.');
+    *tmp = '\0';
+
+    decodage(argv[1],new_filename);
 
     return 0;
 }

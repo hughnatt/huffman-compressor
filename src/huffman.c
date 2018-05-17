@@ -204,7 +204,6 @@ phtree_t creer_htree(uint64_t frequence[256]) {
 
 
 void recur_profondeur(phtree_t t, uint8_t prof[256], uint64_t profondeur){
-	printf("%ld\n",t->taille_label);
     assert(t->taille_label>0);
 	
 	if(t->taille_label==1){

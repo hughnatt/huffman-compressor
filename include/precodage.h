@@ -15,7 +15,6 @@ void mtf_decodage(char *entree, char* sortie);
  */
 void rle_codage(char* file_in, char* file_out);
 
-
 /**
  * 
  */

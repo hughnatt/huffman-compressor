@@ -40,7 +40,7 @@ void detruire_htree(phtree_t t);
  * @param phtree_t a : Noeud racine de l'arbre
  * @param int niveau : Niveau d'origine du noeud racine
  */
-void afficher_arbre(phtree_t a, int niveau)
+void afficher_arbre(phtree_t a, int niveau);
 
 
 #endif

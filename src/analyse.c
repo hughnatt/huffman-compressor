@@ -41,7 +41,6 @@ void frequences(char *filename, uint64_t freq[256])
 	while (!feof(f))
 	{
 		c = fgetc(f);
-		//printf("%c\n", c);
 		freq[c]++;
 	}
 	fclose(f);
