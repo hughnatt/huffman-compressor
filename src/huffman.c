@@ -18,7 +18,7 @@ typedef struct c {
  * @param char label[256]
  * @result phtree : la feuille crée
  */
-phtree_t creer_feuille(uint64_t poids, char label) {
+phtree_t creer_feuille(uint64_t poids, uint8_t label) {
     phtree_t result = malloc(sizeof(htree_t));
     
     result->poids = poids;
@@ -48,6 +48,7 @@ phtree_t creer_noeud_parent(phtree_t n1, phtree_t n2) {
     for (int i = 0; i < n1->taille_label; i++) {
         tree->label[i] = n1->label[i];
     }
+
 
     for (int i = n1->taille_label; i < n1->taille_label + n2->taille_label; i++) {
         tree->label[i] = n2->label[i - n1->taille_label];
@@ -119,7 +120,7 @@ plist_t conversion_list(uint64_t frequence[256]) {
         }
 
         // sinon on créer une feuille pour ce caractère
-        phtree_t feuille = creer_feuille(frequence[i], (char)i);
+        phtree_t feuille = creer_feuille(frequence[i], (uint8_t)i);
 
         // on met la feuille à une position adaptée dans la liste
         result = ajouter_membre(result, feuille);

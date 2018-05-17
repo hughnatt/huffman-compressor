@@ -19,10 +19,17 @@ void writebyte()
     restant = 8;
 }
 
-void writecode(uint8_t code, int taille)
+void writecode(uint64_t code, int taille)
 {
+    printf("Taille : %d", taille);
+    printf("Encode : ");
+    for (int i = 8 - taille; i < 8; i++)
+    {
+        printf("%d", !!((code << i) & 0x80));
+    }
+
     nbsym++;
-    if (taille <= restant)
+    /*if (taille <= restant)
     {
         buffer = buffer << taille;
         buffer = buffer | (code & ~((-1) << taille));
@@ -33,32 +40,30 @@ void writecode(uint8_t code, int taille)
         }
     }
     else
-    {
-        //buffer = buffer << restant;
-        printf("%d", taille);
-        //****
-        code = code << (8 - taille);
-        while (restant != 0)
+    {*/
+
+    //On décale le bit de poids fort vers la gauche
+    code = code << (64 - taille);
+
+    printf("\tEffective : ");
+    //On lit chaque bit valide du code
+    
+        while ( taille > 0)
         {
             buffer = buffer << 1;
-            buffer = buffer | ((code & 0x80) >> 7); //Bit de poids fort ramené à droite
+            buffer = buffer | ((code & 0x8000000000000000) >> 63); //Bit de poids fort ramené à droite
+            printf("%ld",((code & 0x8000000000000000) >> 63));
             code = code << 1;
             taille--;
             restant--;
+            if (restant == 0){
+                writebyte();            
+            }
         }
-
-        writebyte();
-
-        while (taille != 0)
-        {
-            buffer = buffer << 1;
-            buffer = buffer | ((code & 0x80) >> 7); //Bit de poids fort ramené à droite
-            code = code << 1;
-            restant--;
-            taille--;
-        }
-        //****
-    }
+    printf("\n");
+    
+    //****
+    //}
 }
 
 void padcode()
@@ -70,7 +75,7 @@ void padcode()
     }
 }
 
-void transcodage(char *file_in, char *file_out, uint8_t code[256], uint8_t profondeur[256])
+void transcodage(char *file_in, char *file_out, uint64_t code[256], uint8_t profondeur[256])
 {
     f_in = fopen(file_in, "rb");
     f_out = fopen(file_out, "wb");
@@ -86,7 +91,7 @@ void transcodage(char *file_in, char *file_out, uint8_t code[256], uint8_t profo
 
     //uint8_t c;
 
-    uint8_t cc;
+    uint64_t cc;
     int taillec;
 
     //int getcar;
@@ -95,8 +100,9 @@ void transcodage(char *file_in, char *file_out, uint8_t code[256], uint8_t profo
     {
         //c = (uint8_t)getcar;
         cc = code[c];
-        taillec = profondeur[c];
+        taillec = profondeur[c] - 1;
 
+        printf("Caractere %x (%c) -- ", c, c);
         writecode(cc, taillec);
 
         //getcar = fgetc(f_in);
@@ -120,7 +126,6 @@ void transcodage(char *file_in, char *file_out, uint8_t code[256], uint8_t profo
     fclose(f_in);
 }
 
-
 uint8_t bit_suivant()
 {
     static uint8_t c;
@@ -128,7 +133,8 @@ uint8_t bit_suivant()
     //Lit un octet
     if (restant == 0)
     {
-        c = getc(f_in);
+        c = fgetc(f_in);
+        restant = 7;
     }
     else
     {
@@ -141,10 +147,14 @@ uint8_t bit_suivant()
 uint8_t lire_sym(phtree_t arbre_canonique)
 {
     phtree_t node = arbre_canonique;
-    while (node->taille_label != 1){
-        if (bit_suivant){
+    while (node->taille_label != 1)
+    {
+        if (bit_suivant())
+        {
             node = node->fdroit;
-        } else {
+        }
+        else
+        {
             node = node->fgauche;
         }
     }
@@ -152,8 +162,8 @@ uint8_t lire_sym(phtree_t arbre_canonique)
     return node->label[0];
 }
 
-
-void lire_profondeur(uint8_t profondeur[256]){
+void lire_profondeur(uint8_t profondeur[256])
+{
     for (int i = 0; i < 256; i++)
     {
         profondeur[i] = fgetc(f_in);
@@ -162,23 +172,62 @@ void lire_profondeur(uint8_t profondeur[256]){
 
 uint64_t lire_nbsym()
 {
-    uint64_t nb;
+    uint64_t nb = 0;
     uint64_t tmp;
-    tmp = 0;
-    tmp = fgetc(f_out);
 
-    int i = 0;
-    while (i < 8)
+    int i = 7;
+    while (i >= 0)
     {
-
+        tmp = 0;
+        tmp = fgetc(f_in);
         tmp = tmp << (56 - i * 8);
         nb = nb | tmp;
-
-        i++;
-
-        tmp = 0;
-        tmp = fgetc(f_out);
+        i--;
     }
+    return nb;
+}
+
+void afficher_arbre(phtree_t a, int niveau)
+{
+    /*
+    affichage de l'arbre a
+    on l'affiche en le penchant sur sa gauche
+    la partie droite (haute) se retrouve en l'air
+    */
+
+    int i;
+
+    if (a != NULL)
+    {
+        afficher_arbre(a->fdroit, niveau + 1);
+
+        for (i = 0; i < niveau; i++)
+            printf("\t");
+        for (i = 0; i < a->taille_label; i++)
+        {
+            printf("%x", a->label[i]);
+        }
+        printf(" (%d)\n\n", niveau);
+
+        afficher_arbre(a->fgauche, niveau + 1);
+    }
+    return;
+}
+
+void displaytab256(uint8_t tab[256])
+{
+    for (int k = 0; k < 256; k++)
+    {
+        //if ( tab[k] != 0){
+        printf("%d | ", k);
+        for (int i = 0; i < 8; i++)
+        {
+            printf("%d", !!((tab[k] << i) & 0x80));
+        }
+        printf(" \n");
+        //}
+    }
+    printf("\n");
 }
 
 void decodage(char *file_in, char *file_out)
@@ -188,14 +237,20 @@ void decodage(char *file_in, char *file_out)
 
     //Lire nombre de symbole à lire (8 octets)
     uint64_t nbsym = lire_nbsym();
+    printf("Symboles à lire : %ld\n", nbsym);
 
     //Lire la table de profondeur (256 octets)
     uint8_t profondeur[256];
     lire_profondeur(profondeur);
+    displaytab256(profondeur);
+
     //Créer arbre canonique
     phtree_t abr_can = arbre_canonique(profondeur);
 
+    afficher_arbre(abr_can, 1);
+
     //Lecture des symboles
+
     restant = 0;
     int cpt = 0;
     uint8_t c;
@@ -206,7 +261,3 @@ void decodage(char *file_in, char *file_out)
         cpt++;
     }
 }
-
-
-
-

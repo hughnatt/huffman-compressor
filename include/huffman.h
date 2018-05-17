@@ -7,7 +7,7 @@
 typedef struct t
 {
     uint64_t poids;
-    char label[256];
+    uint8_t label[256];
     uint64_t taille_label; //nombre de char dans label
     struct t *fgauche;
     struct t *fdroit;
