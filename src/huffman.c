@@ -140,7 +140,7 @@ plist_t conversion_list(uint64_t frequence[256]) {
 phtree_t creer_htree(uint64_t frequence[256]) {
     plist_t liste = conversion_list(frequence);
 
-    phtree_t arbre;
+    phtree_t arbre = NULL;
 
     if (liste == NULL) {
         return NULL;
@@ -155,16 +155,25 @@ phtree_t creer_htree(uint64_t frequence[256]) {
         liste=supprimer_plus_petit_membre(liste);
     }
 
+    //Si l'arbre est NULL, Cas particulier : un seule type de valeur dans le fichier
     if(arbre==NULL){
-        arbre = creer_feuille(liste->elem->poids,liste->elem->label[0]);
+        phtree_t node = malloc(sizeof(htree_t));
+        node->fdroit = NULL;
+        node->fgauche = NULL;
+        node->poids = 1;
+        node->taille_label = 1;
+        node->label[0] = liste->elem->label[0] + 1;
+        arbre = creer_noeud_parent(liste->elem,node);
     }
 
+    
     return arbre;
 }
 
 
 void recur_profondeur(phtree_t t, uint8_t prof[256], uint64_t profondeur){
-	assert(t->taille_label>0);
+	printf("%ld\n",t->taille_label);
+    assert(t->taille_label>0);
 	
 	if(t->taille_label==1){
 		prof[(int)t->label[0]]=profondeur;

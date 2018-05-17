@@ -56,9 +56,9 @@ int main(int argc, char* argv[]){
     uint8_t prof_tab[256];
     uint64_t code_tab[256];
 
-    printf("========= TABLEAU FREQUENCES ========\n");
+    //printf("========= TABLEAU FREQUENCES ========\n");
     frequences(argv[1],freq_tab);
-    ecriture_tableau_freq(freq_tab);
+    //ecriture_tableau_freq(freq_tab);
 
 
     phtree_t hufftree = creer_htree(freq_tab);
