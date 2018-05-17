@@ -49,7 +49,8 @@ phtree_t creer_noeud_parent(phtree_t n1, phtree_t n2) {
         tree->label[i] = n1->label[i];
     }
 
-    for (int i = n1->taille_label; i < n2->taille_label + n1->taille_label; i++) {
+
+    for (int i = n1->taille_label; i < n1->taille_label + n2->taille_label; i++) {
         tree->label[i] = n2->label[i - n1->taille_label];
     }
 
@@ -96,10 +97,10 @@ plist_t ajouter_membre(plist_t list, phtree_t membre) {
     }
 
     if (tmp == NULL) {
-        if (prev == NULL){
+        if(prev==NULL){
             list = new;
-        } else {
-            prev->next = new;        
+        }else{
+            prev->next = new;
         }
         new->next = NULL;
     }
@@ -124,6 +125,7 @@ plist_t conversion_list(uint64_t frequence[256]) {
         // on met la feuille à une position adaptée dans la liste
         result = ajouter_membre(result, feuille);
     }
+
     return result;
 }
 
@@ -149,8 +151,12 @@ phtree_t creer_htree(uint64_t frequence[256]) {
 
         ajouter_membre(liste, arbre);
 
-        liste = supprimer_plus_petit_membre(liste);
-        liste = supprimer_plus_petit_membre(liste);
+        liste=supprimer_plus_petit_membre(liste);
+        liste=supprimer_plus_petit_membre(liste);
+    }
+
+    if(arbre==NULL){
+        arbre = creer_feuille(liste->elem->poids,liste->elem->label[0]);
     }
 
     return arbre;
@@ -161,7 +167,7 @@ void recur_profondeur(phtree_t t, uint8_t prof[256], uint64_t profondeur){
 	assert(t->taille_label>0);
 	
 	if(t->taille_label==1){
-		prof[(int) t->label[0]]=profondeur;
+		prof[(int)t->label[0]]=profondeur;
 	}else{
 		recur_profondeur(t->fgauche,prof,profondeur+1);
 		recur_profondeur(t->fdroit,prof,profondeur+1);

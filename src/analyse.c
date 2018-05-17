@@ -37,6 +37,7 @@ void frequences(char *filename, uint64_t freq[256])
 
 	init_tab_freq(freq);
 
+
 	while (!feof(f))
 	{
 		c = fgetc(f);

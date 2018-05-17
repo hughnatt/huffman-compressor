@@ -23,9 +23,9 @@ phtree_t creer_htree(uint64_t frequence[256]);
 
 /**
  * Retourne la profondeur de chaque caractère
- * (taille du codage en bit) dans l'arbre t
+ * (taille du codage en bit) de l'arbre t
  * @param phtree_t t
- * @param uint8_t prof[256]
+ * @param uint8_t prof[256] (non initialisé)
  */
 void profondeur(phtree_t t, uint8_t prof[256]);
 
