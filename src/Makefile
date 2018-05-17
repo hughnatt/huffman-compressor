@@ -33,6 +33,6 @@ decompression: decompression.o $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
-	rm -rf $(OBJS) $(EXEC)	
+	rm -rf $(OBJS) $(EXEC) *.o
 
 
