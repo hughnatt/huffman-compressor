@@ -2,7 +2,10 @@
 //#include "mtf.h"
 #include "string.h"
 #include <assert.h>
+#include "math.h"
+#include "stdint.h"
 
+/*Initialisation de la table mtf*/
 void init_tab(char mtf[256]){
 	for (int i = 0; i < 256; ++i)
 	{
@@ -10,6 +13,7 @@ void init_tab(char mtf[256]){
 	}
 }
 
+/*Affiche la table mtf*/
 void afficher_tab(char tab[256]){
 	for (int i = 0; i < 256; ++i){
 
@@ -18,6 +22,7 @@ void afficher_tab(char tab[256]){
 	printf("\n");
 }
 
+/*Renvoie le code du caractère correspondant dans la table*/
 char codage(char c, char mtf[256]){
 	int i=0;
 	while(c!= mtf[i]){
@@ -26,98 +31,87 @@ char codage(char c, char mtf[256]){
 	return (char)i;
 }
 
+
+/*Fonction de décalage de la table mtf*/
 void decalage(char c, char mtf[256]){
 
 	int i =1;
 	int k=1;
 	char tmp0, tmp;
 	tmp0 = mtf[0];
-	if((int)c == -1){
-		mtf[0]=mtf[255];
-		while(k<256){
-			tmp = mtf[k];
-			mtf[k]=tmp0;
-			tmp0=tmp;
-			k++;
-		}
-	}else{
-		mtf[0]= mtf[c];
-		while(i<=(int)c){
+	uint8_t int_c=c;
 
-			tmp = mtf[i];
-			mtf[i]=tmp0;
-			tmp0=tmp;
-			i++;
-		}
-	}
-		printf("\nTableau :\n");
-		afficher_tab(mtf);
+	if((int)c <0){ // On verifie si le code du caractère n'est pas negatif = >127 en decimal dans la table ascii
+		int_c = (int)c +256; //conversion
 	}
 
-
-
-void mtf_codage(char *file_name){
-
-	FILE *f = fopen(file_name, "rb");
-	FILE *new_file = fopen("MID_MTF.txt", "wb");
-	char mtf[256];
-	char c;
-	if (f==NULL){
-		printf("Error file\n");
-		return;
+	mtf[0]= mtf[int_c]; //decalage
+	while(i<=int_c){
+		tmp = mtf[i];
+		mtf[i]=tmp0;
+		tmp0=tmp;
+		i++;
 	}
-	init_tab(mtf);
-	while(!feof(f)){
-		c=fgetc(f);
-		c=codage(c, mtf);
-		decalage(c, mtf);
-		fputc(c,new_file);
-	}
-	fclose(f);
-	fclose(new_file);
+
 }
+
 
 
 void mtf_decodage(char *entree){
     FILE *entry = fopen(entree,"rb"); //ouverture du fichier d'entrée
     assert(entry!=NULL); //le fichier est ouvert
 
-   /* char *tmp = strstr("_MTF",entree); //recherche du motif _MTF
-    assert(tmp!=NULL); //le motif doit être présent
-
-    int i=3;
-    while(tmp[i]!='\0');{
-        i++;
-        tmp[i-4]=tmp[i];
-    }*/
-
     FILE *output = fopen("OUT_MTF","wb"); //ouverture du fichier de sortie
     assert(output!=NULL); //le fichier est ouvert
-
-    char c;
+   
+    char c1,c2;
     char mtf[256];
     init_tab(mtf);
 
-    c=fgetc(entry);
+    fscanf(entry,"%c",&c1);
+ 	uint8_t int_c=c1;
+
 
     while(!feof(entry)){
-        c=mtf[(int)c];
-        fputc(c,output);
-        decalage(c, mtf);
-        c=fgetc(entry);
+
+		if((int)c1 <0){  // On verifie si le code du caractère a decoder n'est pas negatif = >127 en decimal dans la table ascii
+			int_c = (int)c1 +256;
+		}
+        c2=mtf[int_c]; //on recupère directement dans la table mtf
+        fprintf(output, "%c", c2); //on ecrit dans le fichier de sortie
+        decalage(c1, mtf); //on decale la table
+        fscanf(entry,"%c",&c1); //on lit un nouveau caratère
+        int_c=c1;
     }
 
-    fclose(entry);
+    fclose(entry); //fermetures des fichiers
     fclose(output);
 
+}
+void mtf_codage(char *file_name){
+
+    FILE *f = fopen(file_name, "rb");
+    FILE *new_file = fopen("MID_MTF", "wb");
+    char mtf[256];
+    char c;
+    assert(f!=NULL); 
+    init_tab(mtf); //initialisation de la table
+
+    c=fgetc(f);
+    while(!feof(f)){ //on parcours le fichier
+        c=codage(c, mtf); // recupère le code correspondnat au caractère dans la table
+        decalage(c, mtf); //on decale la table
+        fputc(c,new_file); //on ecrit dans le fichier
+        c=fgetc(f); //on recupère un nouveau caractère
+    }
+    fclose(f); //fermetures des fichiers
+    fclose(new_file);
 }
 
 
 	int main(int argc, char const *argv[])
 	{
 		mtf_codage("IN_MTF.txt");
-
-		printf("\n-------------------------------------------------------------------\n");
-		mtf_decodage("MID_MTF.txt");
+		mtf_decodage("MID_MTF");
 		return 0;
 	}

@@ -1,1 +1,39 @@
-bonjour je suis Estelle
+
+void mtf_decodage(char *entree){
+    FILE *entry = fopen(entree,"rb"); //ouverture du fichier d'entrée
+    assert(entry!=NULL); //le fichier est ouvert
+
+    /*char tmp = strstr(entree,"_MTF"); //recherche du motif _MTF
+    assert(tmp!=NULL); //le motif doit être présent
+
+    int i=3;
+    while(tmp[i]!='\0'){
+        i++;
+        tmp[i-4]=tmp[i];
+    }*/
+
+    FILE *output = fopen("OUT_MTF","wb"); //ouverture du fichier de sortie
+    assert(output!=NULL); //le fichier est ouvert
+    uint8_t int_c;
+    char c1,c2;
+    char mtf[256];
+    init_tab(mtf);
+
+    fscanf(entry,"%c",&c1);
+
+    while(!feof(entry)){
+
+        if((int)c1 <0){
+            int_c = (int)c1 +256;
+        }
+        c2=mtf[(int)int_c];
+        printf("on recherche a %i dans mtf\n",c1 );
+        printf("caractere a ecrire : %i\n",c2 );
+        fprintf(output, "%c", c2);
+        decalage(c1, mtf);
+
+        fscanf(entry,"%c",&c1);
+    }
+
+    fclose(entry);
+    fclose(output);
