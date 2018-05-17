@@ -12,6 +12,94 @@ uint64_t nbsym = 0;
 FILE *f_in;
 FILE *f_out;
 
+void encode_rle_prof(uint8_t profondeur[256], uint8_t profondeur_rle[512], uint16_t* taille_rle){
+
+    uint8_t prev2 = profondeur[0];
+    uint8_t prev1 = profondeur[1];
+
+    int j=0;
+    int taille;
+
+    profondeur_rle[j++] = prev2;
+    profondeur_rle[j++] = prev1;
+
+    
+    for(int i=2; i<256; i++){
+
+        if(prev1 == prev2){
+
+            taille = 0;
+
+            while(profondeur[i] == prev1){
+
+            prev2 = prev1;
+            prev1 = profondeur[i];
+
+            taille++;
+            i++;
+
+           }
+           profondeur_rle[j++] = taille;       
+        }
+        
+        profondeur_rle[j++] = profondeur[i];
+        prev2 = prev1;
+        prev1 = profondeur[i];
+
+    }
+    *taille_rle = j-1;
+}
+
+void decode_rle_prof(uint8_t profondeur[256]){
+
+    uint16_t taille_rle = 0;
+
+    uint8_t prev1 = 0;
+    uint8_t prev2 = 0;
+    uint8_t c = 0;
+
+    int tmp = fgetc(f_in);
+    int tmp2 = fgetc(f_in);
+    int j = 0;
+
+    taille_rle = taille_rle | ((tmp & 0xFF) << 8);
+    taille_rle = taille_rle | (tmp2 & 0xFF);
+
+    prev1 = fgetc(f_in);
+    profondeur[j++] = prev1;
+
+    prev2 = fgetc(f_in);
+    profondeur[j++] = prev2;
+
+    taille_rle = taille_rle - 2;
+
+    int i = 0;
+
+    while(taille_rle > 0){
+
+        c = fgetc(f_in);
+        taille_rle--;
+
+        if(prev1 == prev2){
+
+            for( i = 0; i<c; i++){
+                profondeur[j++] = prev1;
+            }
+            prev2 = prev1;
+            prev1 = 0xFF; // Valeur impossible donc le prochain tour de boucle, on ira forcément dans le else
+        }
+        else{
+
+            profondeur[j++] = c;
+            prev2 = prev1;
+            prev1 = c;
+        }
+
+    }
+
+}
+
+
 void writebyte()
 {
     fputc(buffer, f_out);
@@ -29,18 +117,6 @@ void writecode(uint64_t code, int taille)
     }
 
     nbsym++;
-    /*if (taille <= restant)
-    {
-        buffer = buffer << taille;
-        buffer = buffer | (code & ~((-1) << taille));
-        restant = restant - taille;
-        if (restant == 0)
-        {
-            writebyte();
-        }
-    }
-    else
-    {*/
 
     //On décale le bit de poids fort vers la gauche
     code = code << (64 - taille);
@@ -83,12 +159,21 @@ void transcodage(char *file_in, char *file_out, uint64_t code[256], uint8_t prof
 
     fputs("--------", f_out); //Place laissé pour le nombre d'octets
 
-    /*Mettre tableau de profondeur*/
-    for (int i = 0; i < 256; i++)
-    {
-        fputc(profondeur[i], f_out);
-    }
+    uint8_t profondeur_rle[512] = {0};
+    uint16_t taille_rle = 0;
 
+    /*Mettre tableau de profondeur encodé en rle*/
+    encode_rle_prof(profondeur, profondeur_rle, &taille_rle);
+    fputc(taille_rle & 0xFF00,f_out);
+    fputc(taille_rle & 0x00FF,f_out);
+
+    int i = 0;
+    uint8_t a;
+    while (i < taille_rle){
+        a = profondeur_rle[i];
+        fputc(a,f_out);
+        i++;
+    }
     //uint8_t c;
 
     uint64_t cc;
@@ -114,7 +199,7 @@ void transcodage(char *file_in, char *file_out, uint64_t code[256], uint8_t prof
     fseek(f_out, 0, SEEK_SET); // On revient au début du fichier
 
     // On écrit la taille des données
-    int i = 0;
+    i = 0;
     while (i < 8)
     {
         fputc(nbsym, f_out);
@@ -241,7 +326,8 @@ void decodage(char *file_in, char *file_out)
 
     //Lire la table de profondeur (256 octets)
     uint8_t profondeur[256];
-    lire_profondeur(profondeur);
+    //lire_profondeur(profondeur);
+    decode_rle_prof(profondeur);
     displaytab256(profondeur);
 
     //Créer arbre canonique
