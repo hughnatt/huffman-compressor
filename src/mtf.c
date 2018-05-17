@@ -57,11 +57,11 @@ void decalage(char c, char mtf[256]){
 
 
 
-void mtf_decodage(char *entree){
+void mtf_decodage(char *entree, char *sortie){
     FILE *entry = fopen(entree,"rb"); //ouverture du fichier d'entrée
     assert(entry!=NULL); //le fichier est ouvert
 
-    FILE *output = fopen("OUT_MTF","wb"); //ouverture du fichier de sortie
+    FILE *output = fopen(sortie,"wb"); //ouverture du fichier de sortie
     assert(output!=NULL); //le fichier est ouvert
    
     char c1,c2;
@@ -88,10 +88,11 @@ void mtf_decodage(char *entree){
     fclose(output);
 
 }
-void mtf_codage(char *file_name){
 
-    FILE *f = fopen(file_name, "rb");
-    FILE *new_file = fopen("MID_MTF", "wb");
+void mtf_codage(char *file_in, char *file_out){
+
+    FILE *f = fopen(file_in, "rb");
+    FILE *new_file = fopen(file_out, "wb");
     char mtf[256];
     char c;
     assert(f!=NULL); 
@@ -106,12 +107,4 @@ void mtf_codage(char *file_name){
     }
     fclose(f); //fermetures des fichiers
     fclose(new_file);
-}
-
-
-	int main(int argc, char const *argv[])
-	{
-		mtf_codage("IN_MTF.txt");
-		mtf_decodage("MID_MTF");
-		return 0;
 }
