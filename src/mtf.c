@@ -50,8 +50,8 @@ void decalage(char c, char mtf[256]){
 			i++;
 		}
 	}
-		//printf("\nTableau :\n");
-		//afficher_tab(mtf);
+		printf("\nTableau :\n");
+		afficher_tab(mtf);
 	}
 
 
@@ -59,7 +59,7 @@ void decalage(char c, char mtf[256]){
 void mtf_codage(char *file_name){
 
 	FILE *f = fopen(file_name, "rb");
-	FILE *new_file = fopen("nvx_fichier_MTF.txt", "wb");
+	FILE *new_file = fopen("MID_MTF.txt", "wb");
 	char mtf[256];
 	char c;
 	if (f==NULL){
@@ -91,21 +91,20 @@ void mtf_decodage(char *entree){
         tmp[i-4]=tmp[i];
     }*/
 
-    FILE *output = fopen("decodage_mtf","wb"); //ouverture du fichier de sortie
+    FILE *output = fopen("OUT_MTF","wb"); //ouverture du fichier de sortie
     assert(output!=NULL); //le fichier est ouvert
 
     char c;
     char mtf[256];
     init_tab(mtf);
 
-    fscanf(entry,"%c",&c);
+    c=fgetc(entry);
 
     while(!feof(entry)){
         c=mtf[(int)c];
-        fprintf(output, "%c", c);
+        fputc(c,output);
         decalage(c, mtf);
-
-        fscanf(entry,"%c",&c);
+        c=fgetc(entry);
     }
 
     fclose(entry);
@@ -116,7 +115,9 @@ void mtf_decodage(char *entree){
 
 	int main(int argc, char const *argv[])
 	{
-		mtf_codage("test_MTF.txt");
-		mtf_decodage("nvx_fichier_MTF.txt");
+		mtf_codage("IN_MTF.txt");
+
+		printf("\n-------------------------------------------------------------------\n");
+		mtf_decodage("MID_MTF.txt");
 		return 0;
 	}
