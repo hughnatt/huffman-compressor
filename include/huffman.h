@@ -35,4 +35,12 @@ void profondeur(phtree_t t, uint8_t prof[256]);
  */
 void detruire_htree(phtree_t t);
 
+/**
+ * Affichage d'un arbre en console
+ * @param phtree_t a : Noeud racine de l'arbre
+ * @param int niveau : Niveau d'origine du noeud racine
+ */
+void afficher_arbre(phtree_t a, int niveau)
+
+
 #endif

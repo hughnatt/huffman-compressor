@@ -19,31 +19,7 @@ static void displaytab256(uint8_t tab[256]){
 }
 
 
-static void afficher_arbre(phtree_t a, int niveau)
-{
-    /*
-    affichage de l'arbre a
-    on l'affiche en le penchant sur sa gauche
-    la partie droite (haute) se retrouve en l'air
-    */
 
-    int i;
-
-    if (a != NULL)
-    {
-        afficher_arbre(a->fdroit, niveau + 1);
-
-        for (i = 0; i < niveau; i++)
-            printf("\t");
-        for (i = 0; i < a->taille_label ; i++){
-            printf("%x",a->label[i]);
-        }
-        printf(" (%d)\n\n", niveau);
-
-        afficher_arbre(a->fgauche, niveau + 1);
-    }
-    return;
-}
 
 int main(int argc, char* argv[]){
 
