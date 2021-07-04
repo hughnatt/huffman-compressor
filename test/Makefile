@@ -3,7 +3,7 @@ HEAD=../include
 
 OPTIONS = -g -Wall
 
-exec: test_analyse test_huffman
+exec: test_analyse test_huffman test_mtf
 
 
 test_analyse: test_analyse.o analyse.o
@@ -26,6 +26,16 @@ huffman.o: $(SRC)/huffman.c
 	gcc -c $< -I $(HEAD)/ $(OPTIONS)
 
 
+test_mtf: test_mtf.o mtf.o
+	gcc -o $@ test_mtf.o mtf.o
+
+test_mtf.o: test_mtf.c
+	gcc -c $< -I $(HEAD)/ $(OPTIONS)
+
+mtf.o: $(SRC)/mtf.c
+	gcc -c $< -I $(HEAD)/ $(OPTIONS)
+
+
 
 clean:
-	rm -rf *.o test_analyse test_huffman
+	rm -rf *.o test_analyse test_huffman test_mtf

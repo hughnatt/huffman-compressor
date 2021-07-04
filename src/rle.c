@@ -127,10 +127,3 @@ void rle_decodage(char* file_in, char* file_out) {
     fclose(f_in);
     fclose(f_out);
 }
-
-int main(int argc, char* argv[]) {
-    rle_codage(argv[1], "rle.txt");
-    rle_decodage("rle.txt", "rledecode.txt");
-
-    return 0;
-}

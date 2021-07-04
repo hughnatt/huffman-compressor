@@ -12,93 +12,19 @@ uint64_t nbsym = 0;
 FILE *f_in;
 FILE *f_out;
 
-void encode_rle_prof(uint8_t profondeur[256], uint8_t profondeur_rle[512], uint16_t* taille_rle){
-
-    uint8_t prev2 = profondeur[0];
-    uint8_t prev1 = profondeur[1];
-
-    int j=0;
-    int taille;
-
-    profondeur_rle[j++] = prev2;
-    profondeur_rle[j++] = prev1;
-
-    
-    for(int i=2; i<256; i++){
-
-        if(prev1 == prev2){
-
-            taille = 0;
-
-            while(profondeur[i] == prev1){
-
-            prev2 = prev1;
-            prev1 = profondeur[i];
-
-            taille++;
-            i++;
-
-           }
-           profondeur_rle[j++] = taille;       
-        }
-        
-        profondeur_rle[j++] = profondeur[i];
-        prev2 = prev1;
-        prev1 = profondeur[i];
-
+void encode_rle_prof(uint8_t profondeur[256])
+{
+    for (int i = 0; i< 256; i++){
+        fputc(profondeur[i],f_out);
     }
-    *taille_rle = j-1;
 }
 
-void decode_rle_prof(uint8_t profondeur[256]){
-
-    uint16_t taille_rle = 0;
-
-    uint8_t prev1 = 0;
-    uint8_t prev2 = 0;
-    uint8_t c = 0;
-
-    int tmp = fgetc(f_in);
-    int tmp2 = fgetc(f_in);
-    int j = 0;
-
-    taille_rle = taille_rle | ((tmp & 0xFF) << 8);
-    taille_rle = taille_rle | (tmp2 & 0xFF);
-
-    prev1 = fgetc(f_in);
-    profondeur[j++] = prev1;
-
-    prev2 = fgetc(f_in);
-    profondeur[j++] = prev2;
-
-    taille_rle = taille_rle - 2;
-
-    int i = 0;
-
-    while(taille_rle > 0){
-
-        c = fgetc(f_in);
-        taille_rle--;
-
-        if(prev1 == prev2){
-
-            for( i = 0; i<c; i++){
-                profondeur[j++] = prev1;
-            }
-            prev2 = prev1;
-            prev1 = 0xFF; // Valeur impossible donc le prochain tour de boucle, on ira forcément dans le else
-        }
-        else{
-
-            profondeur[j++] = c;
-            prev2 = prev1;
-            prev1 = c;
-        }
-
+void decode_rle_prof(uint8_t profondeur[256])
+{
+    for (int i = 0; i< 256; i++){
+        profondeur[i] = fgetc(f_in);
     }
-
 }
-
 
 void writebyte()
 {
@@ -109,37 +35,44 @@ void writebyte()
 
 void writecode(uint64_t code, int taille)
 {
+#ifdef DEBUG
     printf("Taille : %d", taille);
     printf("Encode : ");
     for (int i = 8 - taille; i < 8; i++)
     {
         printf("%d", !!((code << i) & 0x80));
     }
+#endif
 
     nbsym++;
 
     //On décale le bit de poids fort vers la gauche
     code = code << (64 - taille);
 
+#ifdef DEBUG
     printf("\tEffective : ");
+#endif
+
     //On lit chaque bit valide du code
-    
-        while ( taille > 0)
+
+    while (taille > 0)
+    {
+        buffer = buffer << 1;
+        buffer = buffer | ((code & 0x8000000000000000) >> 63); //Bit de poids fort ramené à droite
+#ifdef DEBUG
+        printf("%ld", ((code & 0x8000000000000000) >> 63));
+#endif
+        code = code << 1;
+        taille--;
+        restant--;
+        if (restant == 0)
         {
-            buffer = buffer << 1;
-            buffer = buffer | ((code & 0x8000000000000000) >> 63); //Bit de poids fort ramené à droite
-            printf("%ld",((code & 0x8000000000000000) >> 63));
-            code = code << 1;
-            taille--;
-            restant--;
-            if (restant == 0){
-                writebyte();            
-            }
+            writebyte();
         }
+    }
+#ifdef DEBUG
     printf("\n");
-    
-    //****
-    //}
+#endif
 }
 
 void padcode()
@@ -159,35 +92,25 @@ void transcodage(char *file_in, char *file_out, uint64_t code[256], uint8_t prof
 
     fputs("--------", f_out); //Place laissé pour le nombre d'octets
 
-    uint8_t profondeur_rle[512] = {0};
-    uint16_t taille_rle = 0;
 
     /*Mettre tableau de profondeur encodé en rle*/
-    encode_rle_prof(profondeur, profondeur_rle, &taille_rle);
-    fputc(taille_rle & 0xFF00,f_out);
-    fputc(taille_rle & 0x00FF,f_out);
-
-    int i = 0;
-    uint8_t a;
-    while (i < taille_rle){
-        a = profondeur_rle[i];
-        fputc(a,f_out);
-        i++;
-    }
-    //uint8_t c;
+    encode_rle_prof(profondeur);
 
     uint64_t cc;
-    int taillec;
+    int taillec, i;
 
-    //int getcar;
+
     int c = fgetc(f_in);
     while (c != EOF)
     {
-        //c = (uint8_t)getcar;
+
         cc = code[c];
         taillec = profondeur[c] - 1;
 
+#ifdef DEBUG
         printf("Caractere %x (%c) -- ", c, c);
+#endif
+
         writecode(cc, taillec);
 
         //getcar = fgetc(f_in);
@@ -272,33 +195,6 @@ uint64_t lire_nbsym()
     return nb;
 }
 
-void afficher_arbre(phtree_t a, int niveau)
-{
-    /*
-    affichage de l'arbre a
-    on l'affiche en le penchant sur sa gauche
-    la partie droite (haute) se retrouve en l'air
-    */
-
-    int i;
-
-    if (a != NULL)
-    {
-        afficher_arbre(a->fdroit, niveau + 1);
-
-        for (i = 0; i < niveau; i++)
-            printf("\t");
-        for (i = 0; i < a->taille_label; i++)
-        {
-            printf("%x", a->label[i]);
-        }
-        printf(" (%d)\n\n", niveau);
-
-        afficher_arbre(a->fgauche, niveau + 1);
-    }
-    return;
-}
-
 void displaytab256(uint8_t tab[256])
 {
     for (int k = 0; k < 256; k++)
@@ -320,20 +216,30 @@ void decodage(char *file_in, char *file_out)
     f_in = fopen(file_in, "rb");
     f_out = fopen(file_out, "wb");
 
+    if (f_in == NULL || f_out == NULL)
+    {
+        printf("FATAL ERROR, Erreur d'ouverture de fichier\n%s\n%s", file_in, file_out);
+        exit(-1);
+    }
     //Lire nombre de symbole à lire (8 octets)
     uint64_t nbsym = lire_nbsym();
-    printf("Symboles à lire : %ld\n", nbsym);
+    //printf("Symboles à lire : %ld\n", nbsym);
 
     //Lire la table de profondeur (256 octets)
     uint8_t profondeur[256];
     //lire_profondeur(profondeur);
     decode_rle_prof(profondeur);
+
+    #ifdef DEBUG
     displaytab256(profondeur);
+    #endif
 
     //Créer arbre canonique
     phtree_t abr_can = arbre_canonique(profondeur);
 
+#ifdef DEBUG
     afficher_arbre(abr_can, 1);
+#endif
 
     //Lecture des symboles
 
@@ -346,4 +252,7 @@ void decodage(char *file_in, char *file_out)
         fputc(c, f_out);
         cpt++;
     }
+
+    fclose(f_in);
+    fclose(f_out);
 }

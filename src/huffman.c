@@ -131,6 +131,38 @@ plist_t conversion_list(uint64_t frequence[256]) {
 
 //_______________________ Partie déclarée _______________________
 
+/**
+ * Affichage d'un arbre en console
+ * @param phtree_t a : Noeud racine de l'arbre
+ * @param int niveau : Niveau d'origine du noeud racine
+ */
+void afficher_arbre(phtree_t a, int niveau)
+{
+    /*
+    affichage de l'arbre a
+    on l'affiche en le penchant sur sa gauche
+    la partie droite (haute) se retrouve en l'air
+    */
+
+    int i;
+
+    if (a != NULL)
+    {
+        afficher_arbre(a->fdroit, niveau + 1);
+
+        for (i = 0; i < niveau; i++)
+            printf("\t");
+        for (i = 0; i < a->taille_label ; i++){
+            printf("%x",a->label[i]);
+        }
+        printf(" (%d)\n\n", niveau);
+
+        afficher_arbre(a->fgauche, niveau + 1);
+    }
+    return;
+}
+
+
 /*
  * Crée un arbre de Huffman quelconque à partir
  * du tableau des fréquences
@@ -172,7 +204,6 @@ phtree_t creer_htree(uint64_t frequence[256]) {
 
 
 void recur_profondeur(phtree_t t, uint8_t prof[256], uint64_t profondeur){
-	printf("%ld\n",t->taille_label);
     assert(t->taille_label>0);
 	
 	if(t->taille_label==1){
